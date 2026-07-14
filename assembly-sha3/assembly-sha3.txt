@@ -1,0 +1,70 @@
+Sha3 assembly implementation using AI
+
+# AI and assembly code
+
+AI has revolutionized coding. In just the last 6 months, AI has gone from being
+mainly a code completion tool in editors to full fledged autonomous coding
+agents. I will describe my general views and predictions for AI in future articles. 
+However, in this article, I will narrow down and discuss a particular topic, 
+namely whether AI agents are good at assembly coding.
+
+# The Sha3 hash algorithm as a test case
+# Why Sha3,
+
+I decided to perform an experiment. I selected a well defined, 
+interesting, and not too large, task to solve. The choice fell on
+the Sha3 hash function. I chose sha3 for several reasons.
+
+ because I was familiar with the algorithm.
+I had done a JS.
+I like the concept of it, the sponge construction.
+It is an important algorithm.
+I like the algorithm. The sponge is really elegant. Makes older 
+cryptographic algorithms look more ad-hoc.
+
+JS implementation last year.
+
+# Summary of Sha3
+
+Describe Sha3 
+Link to specification
+
+
+# Implementation
+
+Link to github repo.
+
+# Procedure
+
+Iterate, discuss the code with agents.
+Codex, GTP5.5, GPT5.6, Claude Opus-4.8, Fable
+
+
+# Web assembly sha3
+
+| size (B) | wasm MiB/s | wasm/node performance |
+| --- | ---: | ---: |
+| 1048576 | 599.28 | 0.69x |
+
+# x86_64 sha3
+
+| size (B) | asm MiB/s | asm/OpenSSL | asm/gcrypt |
+| --- | ---: | ---: | ---: |
+| 1048576 | 736.27 | 1.29x | 1.01x |
+
+# Arm Mac os Sha3
+
+| size (B) | asm MiB/s | asm/CryptoKit | asm/OpenSSL |
+| --- | ---: | ---: | ---: |
+| 1048576 | 883.08 | 1.09x | 1.01x |
+
+# Explanation of performance results.
+
+Specialization to 256.
+Optimize for specific environments.
+Inlining, fewer function calls. smaller code sizes,
+
+# Ramifications
+
+I will describe my thoughts in a follow up article.
+Consequences for programming bigger perspcetive in follow up article.

@@ -1,0 +1,21 @@
+Programming in the AI era.
+
+Performance and energy usage file size more important.
+Readability, reusable, modular code less important.
+
+How would programs be written if programmers were almost infinitely good?
+
+Inlining, specialization.
+
+Most of the programming landscape is made for hmans that are not infinitely good.
+Editors are made because humans cannot keep all code in their heads.
+Compilers are there because humans 
+Templates and generics are there because humans cannot easily by themselves.
+
+What happens to code review.
+
+Code reviews 
+
+Standard languages
+
+ 
