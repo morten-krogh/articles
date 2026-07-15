@@ -1,100 +1,102 @@
-An assembly implementation of Sha3 using AI
+An Assembly Implementation of SHA-3 Using AI
 
 # Assembly coding is natural for AI
 
-AI has revolutionized coding. In the last year or so, AI has gone from being
-mainly a code completion tool in embedded in editors to full fledged autonomous coding
-agents. In a future article, I will describe my general views and predictions for AI in
-conding and other aspects of society. However, in this article, I will narrow
-down and discuss the use of AI for assembly coding.
+AI has revolutionized coding. In the last year or so, AI coding tools have
+evolved from advanced code completion in editors into full-fledged autonomous
+coding agents. In a future article, I will describe my general views and
+predictions about AI in coding. In this article,
+however, I will focus on the use of AI for assembly coding.
 
-# The Sha3 hash algorithm as a test case Why Sha3,
+# The SHA-3 hash algorithm as a test case
 
-Since I am curious about whether AI is good for assembly coding, I decided 
-to perform an experiment. I selected a well defined, 
-interesting, and not too large, task to solve. My choice fell on
-the Sha3 hash function. There were several reasons for that choice.
-Firstly, I was familiar with the principles and algorithm behind it.
-I had done a Javescript implementation by hand of it earlier.
-Secondly, I appreciate the principles behind its design.
-Thirdly, it is an important and famous algorithm. 
+I have been curious for some time about whether AI is good at assembly coding, so 
+I decided to
+perform an experiment. I selected a well-defined and interesting task that was
+not too large. My choice was the SHA3-256 hash function. There were several
+reasons for that choice. First, I was familiar with the principles and
+algorithm behind it. I had previously written a JavaScript implementation by
+hand. Second, I appreciate its design principles. Third, it is an important
+, well-known and standardized algorithm.
 
+# Summary of SHA-3
 
-# Summary of Sha3
-
-Keccak is the underlying algorithm family; SHA-3 is the NIST-standardized hash family built from Keccak.
-NIST selected Keccak as the winner of the SHA-3 hash-function competition in 2012. , 
-
-and FIPS 202 defines the SHA-3 family as functions based on instances of Keccak
+Keccak is the underlying algorithm family; SHA-3 is the NIST-standardized hash
+family built from Keccak. NIST selected Keccak as the winner of the SHA-3
+hash-function competition in 2012, and FIPS 202 defines the SHA-3 family as
+a set of functions based on Keccak.
 
 https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.202.pdf
 
-The hash function takes an input
-which is a sequence of bytes and returns a sequence of 32 bytes = 256 bits. The output is
-conveniently represented as a hex string of length 64.
-For example,
+The SHA3-256 hash function takes a sequence of bytes as input and returns 32 bytes, or
+256 bits. The 256 bit output is conveniently represented as a 64-character
+hexadecimal string. For example:
 
 sha3-256([30, 40]) = "bab9db9ee55722e9f6dda3716567417ff4084d972d4f0a9f32fe1b9f783b97ff"
 
-Actually, the input could be a sequence of bits that do not make up an integer number of bytes,
-but we do not care about that here, and assume that the input consists of bytes.
+The input bits must not be representable as an integral number of bytes.
+However, we do not consider that case here and assume that
+the input consists of bytes.
 
-Briefly, the algoritmh works like this. There is a 200 byte = 1600 bits state
-that starts out as zero filled. The input byte sequence is first padded in a
-precise way such that the input can be broken into an integral number of blocks
-of 136 bytes. Each block is processed by first xor'ing it into the first 136
-bytes of the state and then permuting the bits in the state in 24 rounds. Each
-round, called a Keccak round, consists of 5 steps itself. The steps consists of
-both linear and non-linear operations of the 1600 bits. Furthermore, there is
-also a step that mixes completely fixed constants into the state. There is one
-fixed constant for each of the 24 round. The 24 rounds are identical except for
-the constants used. The upshot is that the original bytes are absorbed into the state and the state 
-itself is scrambled. After mixing all blocks in, the final result of the hash is read out from the 
-first 32 bytes of the state. 
+Briefly, the algorithm works as follows. It has a 200-byte, or 1,600-bit, state
+that is initially filled with zeros. The input byte sequence is first padded in
+a precise way so that it can be divided into an integral number of 136-byte
+blocks. Each block is processed by first XORing it into the first 136 bytes of
+the state and then permuting the bits in the state over 24 rounds. Each round,
+called a Keccak round, consists of five steps. These steps perform both linear
+and nonlinear operations on the 1,600 bits. The last iof the 5 steps mixes a fixed
+constant into the state, with a different constant used in each of the 24
+rounds. The rounds are otherwise identical. The upshot is that the original
+bytes are absorbed into the state, and the state itself is scrambled. After
+all the blocks have been mixed in, the final hash is read from the first 32
+bytes of the state.
 
 This construction is called the sponge construction. It has two phases. The
-first phase is the absorption phase where data is absorbed into the sponge and
-scrambled. The second phase is the squeezing phase, where bytes are read from
-the sponge. In the case of the sha3-256, the readout is short, but if the
-readout had been longer, the sponge would have undergone the 24 Keccak rounds
-repeatedly for each block of output.
+first phase is the absorption phase, in which data is absorbed into the sponge
+and scrambled. The second phase is the squeezing phase, in which bytes are
+read from the sponge. In the case of SHA3-256, the squeezing phase is short. 
+There are other uses of the Keccak sponge, such as the SHAKE function, where
+the sponge would undergo the 24 Keccak rounds repeatedly for multiple blocks
+of output.
 
-The sponge construction is very elegant and can be used for other purposes than the sha3-256 
-hash function, but that is beyond this article.
+The sponge construction is very elegant and can be used for purposes other
+than the SHA3-256 hash function, but that is beyond the scope of this article.
 
 # How the coding agents were used
 
-The procedure was to collaborate with the coding agents, Codex with GPT5.5 and
-GPT5.6 and Claude with Opus4.8 and Fable 5. The point was not to compare the
-agents with each other, but rather a team work between me and them. The code
-was written purely by the agents. My role was to drive the goals, write
-prompts, update the goals, occasionally look a the code, suggest some
-improvements such as less copying of buffers, change the API, or to ask them to
-look again for improvements. The performance and cose size were measured
-regularly. The goal was to have as high performance as possible, except that
-tiny performance improvements at the expense of a much larger code size were
-skipped.
+I "collaborated" with several coding agents: Codex GPT-5.5 / GPT-5.6, and
+Claude Opus 4.8 / Fable 5. The point was not to compare the agents with
+one another, but rather to work as a team with them. The code was written
+entirely by the agents. My role was to set and update the goals, write prompts,
+occasionally inspect the code, suggest improvements such as reducing buffer
+copies, inlining functions, or change the function signatures.
+Fuerthermore, I also asked the agents repeatedly to look for further
+improvements. Performance and code size were measured regularly. The goal was
+to maximize performance, except for tiny improvements at the expense of
+a much larger code size.
 
-#  Implementations
+# Implementations
 
-The implementations, together with others, are published in this Github repository,
+The implementations, together with others, are published in this GitHub
+repository:
 https://github.com/morten-krogh/algorithms/tree/main
-The repository contains the assembly files together with some tests,  benchmarks, and command line
-invocations of the hash functions.
+The repository contains the assembly files together with some tests,
+benchmarks, and command-line invocations of the hash functions.
 
-There are three implementations of the Sha3-256 algorithm, one in web assembly, one in 
-x86_64 assembly for Linux, and one for Arm64 for MacOS. The important code itself is 
-written directly in the assembly languages, a wat file for web assembly and x86_64 and arm64 for the other two.
+There are three implementations of the SHA3-256 algorithm: one in WebAssembly,
+one in x86-64 assembly for Linux, and one in Arm64 assembly for macOS. The core
+code is written directly in each platform's assembly format: WebAssembly Text
+(`.wat`) for WebAssembly, x86-64 assembly for Linux, and Arm64 assembly for
+macOS.
 
-Below I show three benchmark tables. The rows represent different input sizes.  
-The comparison is with two other implementations that depend on the case. 
-In general, for larger inputs the efficiency of the Keccak rounds matter more, and for 
-smaller inputs, the benchmarks are dominated by copying and the crossing of language barriers.
-The larger inputs should probably be seen as the most interesting cases.
+Below are three benchmark tables. The rows represent different input sizes.
+Each table compares one of these implementations with two alternatives
+appropriate to that platform. In general, the efficiency of the Keccak rounds
+matters more for larger inputs. For smaller inputs, the benchmarks are
+dominated by copying and crossing language barriers. The larger inputs are
+probably the most interesting cases.
 
-# Web assembly sha3
-
-
+# WebAssembly SHA-3
 
 ```
   size(B)     iters   sha3-256-wasm(ms)   sha3-256-wasm h/s   sha3-256-wasm MiB/s    node(ms)     node h/s   node MiB/s   hash-wasm(ms)   hash-wasm h/s   hash-wasm MiB/s   sha3-256-wasm/node   sha3-256-wasm/hash-wasm
@@ -107,18 +109,23 @@ The larger inputs should probably be seen as the most interesting cases.
  10485760        30              502.25                  60                597.32      346.39           87       866.08          592.40              51            506.41                0.69x                     1.18x
 ```
 
-The "sha3-256-wasm" algorithm is the one presented in this article.
-The "hash-wasm" algorithm is the highest performance published js/wasm algorithm I could find.
-The "node" algorithm is running node-js woth OpenSSL, so it is a native codebase on the MacOS M1 machine 
-where this benchmark was run. We see that this new implementation is the fast webassembly algorithm and 
-is within 30% of a native node-js/OpenSSL implementation. For small inputs, the current sha3-256-wasm implementation 
-is actually faster than the node-js/OpenSSL implementation. In general, for small inputs the performance is mostly determined by
-the buffer copying and crossing language barriers. For large inputs, the performance has mostly to do with the efficiency of 
-the Keccak rounds but performance can always be negatively impacted by unnecassary copies.
+"sha3-256-wasm" is the implementation presented here. The
+"hash-wasm" implementation is the highest-performance published JavaScript/Wasm
+implementation I could find. The "node" implementation runs Node.js with
+OpenSSL, so it uses native code on the M1 Mac where this benchmark was run. We
+see that the new implementation is faster than the other WebAssembly
+implementation and comes within 30% of the native Node.js/OpenSSL
+implementation. For small inputs, the current "sha3-256-wasm" implementation
+is actually faster than the Node.js/OpenSSL implementation. In general,
+performance for small inputs is mostly determined by buffer copying and
+crossing language barriers. For large inputs, performance depends mostly on
+the efficiency of the Keccak rounds, although it can always be negatively
+affected by unnecessary copies. There are also some issues with webassembly just 
+in time compilation by V8 during execution that should be noted; V8 will run a 
+slower implementation of webassembly code in the beginning to speed up startup time.
+Here, the implementations have been warmed up before becnhmarking.
 
-
-
-# x86_64 Linux sha3
+# x86-64 Linux SHA-3
 
 ```
   size(B)     iters   sha3-256-x86_64-linux(ms)   sha3-256-x86_64-linux h/s   sha3-256-x86_64-linux MiB/s   OpenSSL(ms)    OpenSSL h/s    OpenSSL MiB/s   gcrypt(ms)    gcrypt h/s    gcrypt MiB/s   sha3-256-x86_64-linux/OpenSSL   sha3-256-x86_64-linux/gcrypt
@@ -132,19 +139,20 @@ the Keccak rounds but performance can always be negatively impacted by unnecassa
 worst repetition spread: sha3-256-x86_64-linux 9.5%, OpenSSL 30.5%, gcrypt 16.7%
 ```
 
-The "sha3-256-x86_64-linux" is the currently presented algorithm. Is is
-compared to "OpenSSL" and "gcrypt".  We see that the current algorithm is
-consistently faster than OpenSSL and on par with gcrypt. So OpenSSL clearly
-leaves some performance on the table.  We believe that the current algorithm
-and the gcrypt algorithm hits the maxcimum performance on that architecture.
-There is an interesting 1%-2% difference in favor of the current algorithm,
-which has a simple explanation. The current algorithm is hardcoded to sha3-256
-instead of a generic sha3 that works for the other output sizes such as 512.
-The difference is not important, but it illustrates an important point; in an
-AI assisted programming environment, the need for generic code is less than it
-is in a standard programming world where we generally prefer reuse of code.
+The "sha3-256-x86_64-linux" implementation is the one presented here. It is
+compared with OpenSSL and gcrypt. We see that the current implementation is
+consistently faster than OpenSSL and on par with gcrypt. OpenSSL therefore
+clearly leaves some performance on the table. We believe that the current
+implementation and the gcrypt implementation reach the maximum performance
+achievable on that architecture. There is an interesting 1%-2% difference in
+favor of the current implementation, which has a simple explanation: it is
+hard-coded for SHA3-256 rather than being a generic SHA-3 implementation that
+supports other output sizes, such as SHA3-512. The difference is not important,
+but it illustrates an important point: in an AI-assisted programming
+environment, the need for generic code is lower than in a traditional
+programming environment, where we generally prefer code reuse.
 
-# Arm Mac os Sha3
+# Arm64 macOS SHA-3
 
 ```
   size(B)     iters   sha3-256-arm64-macos(ms)   sha3-256-arm64-macos h/s   sha3-256-arm64-macos MiB/s   CryptoKit(ms)  CryptoKit h/s   CryptoKit MiB/s   OpenSSL(ms)    OpenSSL h/s    OpenSSL MiB/s   sha3-256-arm64-macos/CryptoKit   sha3-256-arm64-macos/OpenSSL
@@ -158,23 +166,23 @@ is in a standard programming world where we generally prefer reuse of code.
 worst repetition spread: sha3-256-arm64-macos 2.5%, CryptoKit 3.0%, OpenSSL 3.2%
 ```
 
-The "sha3-256-arm64-macos" is the current algorithm, and the compariosn is with
-Apple's "Cryptokit" and "OpenSSL". We see similar results to x86_64 with the
-differenc that OpenSSL is on par with our code. Cryptokit on the other hand
-leaves some performance on the table. Our implementation has the same 1%-2%
-advantage over OpenSSL that it had over "gcrypt" above for similar reasons; our
-code is hard wired to the 256 bit version of the Sha3 algorithm.
-
+The "sha3-256-arm64-macos" implementation is the one presented here, and it is
+compared with Apple's CryptoKit and OpenSSL. We see results similar to those on
+x86-64, except that OpenSSL is on par with our code. CryptoKit, on the other
+hand, leaves some performance on the table. Our implementation has the same
+1%-2% advantage over OpenSSL that it had over gcrypt above for the same reason:
+our code is hard-coded for the 256-bit version of the SHA-3 algorithm.
 
 # Conclusions
 
-I would say that this coding experiment validated the hypothesis that AI agents can write 
-directly in assembly code. They don't need higher level languages and compilers to 
-produce executable code. They can optimize the instructions in the assembly program for
-performance and code size. Also, hard coding the exact parameters, say sha3-256 rather 
-than sha3-512, could not surprisingly, lead to higher performance and smaller code sizes.
-The new aspect of this is it is feasible to pursue such optimizations since AI programming 
-is so fast relative to human programming.
+I would say that this coding experiment validated the hypothesis that AI agents
+can write assembly code directly. They do not need higher-level languages and
+compilers to produce executable code. They can optimize the instructions in an
+assembly program for performance and code size. Also, hard-coding the exact
+parameters for SHA3-256 rather than implementing generic support for variants
+such as SHA3-512 can, unsurprisingly, lead to higher performance and smaller
+code sizes. What is new here is that pursuing such optimizations is feasible
+because AI-assisted programming is so fast relative to human programming.
 
-I will leave it at that here, and elaborate on my thoughts on programming 
+I will leave it at that here and elaborate on my thoughts on programming
 in future articles.
