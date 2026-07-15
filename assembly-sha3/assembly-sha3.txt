@@ -82,21 +82,17 @@ https://github.com/morten-krogh/algorithms/tree/main
 The repository contains the assembly files together with some tests,  benchmarks, and command line
 invocations of the hash functions.
 
-Let me describe the three cases, their benchmarks and some crucial points.
-
-
-
 There are three implementations of the Sha3-256 algorithm, one in web assembly, one in 
 x86_64 assembly for Linux, and one for Arm64 for MacOS. The important code itself is 
-written directly in the assembly languages.
+written directly in the assembly languages, a wat file for web assembly and x86_64 and arm64 for the other two.
 
-
+Below I show three benchmark tables. The rows represent different input sizes.  
+The comparison is with two other implementations that depend on the case. 
+In general, for larger inputs the efficiency of the Keccak rounds matter more, and for 
+smaller inputs, the benchmarks are dominated by copying and the crossing of language barriers.
+The larger inputs should probably be seen as the most interesting cases.
 
 # Web assembly sha3
-
-The code was written directly in a wat file, the web assembly text format using S expressions.
-As usual the web assembly is driven from Javascript. There is a benchmark table in the 
-
 
 
 
@@ -111,7 +107,18 @@ As usual the web assembly is driven from Javascript. There is a benchmark table 
  10485760        30              502.25                  60                597.32      346.39           87       866.08          592.40              51            506.41                0.69x                     1.18x
 ```
 
-# x86_64 sha3
+The "sha3-256-wasm" algorithm is the one presented in this article.
+The "hash-wasm" algorithm is the highest performance published js/wasm algorithm I could find.
+The "node" algorithm is running node-js woth OpenSSL, so it is a native codebase on the MacOS M1 machine 
+where this benchmark was run. We see that this new implementation is the fast webassembly algorithm and 
+is within 30% of a native node-js/OpenSSL implementation. For small inputs, the current sha3-256-wasm implementation 
+is actually faster than the node-js/OpenSSL implementation. In general, for small inputs the performance is mostly determined by
+the buffer copying and crossing language barriers. For large inputs, the performance has mostly to do with the efficiency of 
+the Keccak rounds but performance can always be negatively impacted by unnecassary copies.
+
+
+
+# x86_64 Linux sha3
 
 ```
   size(B)     iters   sha3-256-x86_64-linux(ms)   sha3-256-x86_64-linux h/s   sha3-256-x86_64-linux MiB/s   OpenSSL(ms)    OpenSSL h/s    OpenSSL MiB/s   gcrypt(ms)    gcrypt h/s    gcrypt MiB/s   sha3-256-x86_64-linux/OpenSSL   sha3-256-x86_64-linux/gcrypt
@@ -125,8 +132,17 @@ As usual the web assembly is driven from Javascript. There is a benchmark table 
 worst repetition spread: sha3-256-x86_64-linux 9.5%, OpenSSL 30.5%, gcrypt 16.7%
 ```
 
-
-
+The "sha3-256-x86_64-linux" is the currently presented algorithm. Is is
+compared to "OpenSSL" and "gcrypt".  We see that the current algorithm is
+consistently faster than OpenSSL and on par with gcrypt. So OpenSSL clearly
+leaves some performance on the table.  We believe that the current algorithm
+and the gcrypt algorithm hits the maxcimum performance on that architecture.
+There is an interesting 1%-2% difference in favor of the current algorithm,
+which has a simple explanation. The current algorithm is hardcoded to sha3-256
+instead of a generic sha3 that works for the other output sizes such as 512.
+The difference is not important, but it illustrates an important point; in an
+AI assisted programming environment, the need for generic code is less than it
+is in a standard programming world where we generally prefer reuse of code.
 
 # Arm Mac os Sha3
 
@@ -142,13 +158,17 @@ worst repetition spread: sha3-256-x86_64-linux 9.5%, OpenSSL 30.5%, gcrypt 16.7%
 worst repetition spread: sha3-256-arm64-macos 2.5%, CryptoKit 3.0%, OpenSSL 3.2%
 ```
 
-# Explanation of performance results.
+The "sha3-256-arm64-macos" is the current algorithm, and the compariosn is with
+Apple's "Cryptokit" and "OpenSSL". We see similar results to x86_64 with the
+differenc that OpenSSL is on par with our code. Cryptokit on the other hand
+leaves some performance on the table. Our implementation has the same 1%-2%
+advantage over OpenSSL that it had over "gcrypt" above for similar reasons; our
+code is hard wired to the 256 bit version of the Sha3 algorithm.
 
-Specialization to 256.
-Optimize for specific environments.
-Inlining, fewer function calls. smaller code sizes,
 
-# Ramifications
+# Conclusions and ramifications
 
-I will describe my thoughts in a follow up article.
+The ramifications of coding agents that can program directly in assembly is huge, and should in
+my opinion shape how software should be written and structured
+I will describe my thoughts on programming in the future in later articles, 
 Consequences for programming bigger perspcetive in follow up article.
