@@ -166,9 +166,15 @@ advantage over OpenSSL that it had over "gcrypt" above for similar reasons; our
 code is hard wired to the 256 bit version of the Sha3 algorithm.
 
 
-# Conclusions and ramifications
+# Conclusions
 
-The ramifications of coding agents that can program directly in assembly is huge, and should in
-my opinion shape how software should be written and structured
-I will describe my thoughts on programming in the future in later articles, 
-Consequences for programming bigger perspcetive in follow up article.
+I would say that this coding experiment validated the hypothesis that AI agents can write 
+directly in assembly code. They don't need higher level languages and compilers to 
+produce executable code. They can optimize the instructions in the assembly program for
+performance and code size. Also, hard coding the exact parameters, say sha3-256 rather 
+than sha3-512, could not surprisingly, lead to higher performance and smaller code sizes.
+The new aspect of this is it is feasible to pursue such optimizations since AI programming 
+is so fast relative to human programming.
+
+I will leave it at that here, and elaborate on my thoughts on programming 
+in future articles.
