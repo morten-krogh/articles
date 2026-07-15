@@ -1,46 +1,104 @@
-Sha3 assembly implementation using AI
+An assembly implementation of Sha3 using AI
 
-# AI and assembly code
+# Assembly coding is natural for AI
 
-AI has revolutionized coding. In just the last 6 months, AI has gone from being
-mainly a code completion tool in editors to full fledged autonomous coding
-agents. I will describe my general views and predictions for AI in future articles. 
-However, in this article, I will narrow down and discuss a particular topic, 
-namely whether AI agents are good at assembly coding.
+AI has revolutionized coding. In the last year or so, AI has gone from being
+mainly a code completion tool in embedded in editors to full fledged autonomous coding
+agents. In a future article, I will describe my general views and predictions for AI in
+conding and other aspects of society. However, in this article, I will narrow
+down and discuss the use of AI for assembly coding.
 
-# The Sha3 hash algorithm as a test case
-# Why Sha3,
+# The Sha3 hash algorithm as a test case Why Sha3,
 
-I decided to perform an experiment. I selected a well defined, 
-interesting, and not too large, task to solve. The choice fell on
-the Sha3 hash function. I chose sha3 for several reasons.
+Since I am curious about whether AI is good for assembly coding, I decided 
+to perform an experiment. I selected a well defined, 
+interesting, and not too large, task to solve. My choice fell on
+the Sha3 hash function. There were several reasons for that choice.
+Firstly, I was familiar with the principles and algorithm behind it.
+I had done a Javescript implementation by hand of it earlier.
+Secondly, I appreciate the principles behind its design.
+Thirdly, it is an important and famous algorithm. 
 
- because I was familiar with the algorithm.
-I had done a JS.
-I like the concept of it, the sponge construction.
-It is an important algorithm.
-I like the algorithm. The sponge is really elegant. Makes older 
-cryptographic algorithms look more ad-hoc.
-
-JS implementation last year.
 
 # Summary of Sha3
 
-Describe Sha3 
-Link to specification
+Keccak is the underlying algorithm family; SHA-3 is the NIST-standardized hash family built from Keccak.
+NIST selected Keccak as the winner of the SHA-3 hash-function competition in 2012. , 
+
+and FIPS 202 defines the SHA-3 family as functions based on instances of Keccak
+
+https://nvlpubs.nist.gov/nistpubs/fips/nist.fips.202.pdf
+
+The hash function takes an input
+which is a sequence of bytes and returns a sequence of 32 bytes = 256 bits. The output is
+conveniently represented as a hex string of length 64.
+For example,
+
+sha3-256([30, 40]) = "bab9db9ee55722e9f6dda3716567417ff4084d972d4f0a9f32fe1b9f783b97ff"
+
+Actually, the input could be a sequence of bits that do not make up an integer number of bytes,
+but we do not care about that here, and assume that the input consists of bytes.
+
+Briefly, the algoritmh works like this. There is a 200 byte = 1600 bits state
+that starts out as zero filled. The input byte sequence is first padded in a
+precise way such that the input can be broken into an integral number of blocks
+of 136 bytes. Each block is processed by first xor'ing it into the first 136
+bytes of the state and then permuting the bits in the state in 24 rounds. Each
+round, called a Keccak round, consists of 5 steps itself. The steps consists of
+both linear and non-linear operations of the 1600 bits. Furthermore, there is
+also a step that mixes completely fixed constants into the state. There is one
+fixed constant for each of the 24 round. The 24 rounds are identical except for
+the constants used. The upshot is that the original bytes are absorbed into the state and the state 
+itself is scrambled. After mixing all blocks in, the final result of the hash is read out from the 
+first 32 bytes of the state. 
+
+This construction is called the sponge construction. It has two phases. The
+first phase is the absorption phase where data is absorbed into the sponge and
+scrambled. The second phase is the squeezing phase, where bytes are read from
+the sponge. In the case of the sha3-256, the readout is short, but if the
+readout had been longer, the sponge would have undergone the 24 Keccak rounds
+repeatedly for each block of output.
+
+The sponge construction is very elegant and can be used for other purposes than the sha3-256 
+hash function, but that is beyond this article.
+
+# How the coding agents were used
+
+The procedure was to collaborate with the coding agents, Codex with GPT5.5 and
+GPT5.6 and Claude with Opus4.8 and Fable 5. The point was not to compare the
+agents with each other, but rather a team work between me and them. The code
+was written purely by the agents. My role was to drive the goals, write
+prompts, update the goals, occasionally look a the code, suggest some
+improvements such as less copying of buffers, change the API, or to ask them to
+look again for improvements. The performance and cose size were measured
+regularly. The goal was to have as high performance as possible, except that
+tiny performance improvements at the expense of a much larger code size were
+skipped.
+
+#  Implementations
+
+The implementations, together with others, are published in this Github repository,
+https://github.com/morten-krogh/algorithms/tree/main
+The repository contains the assembly files together with some tests,  benchmarks, and command line
+invocations of the hash functions.
+
+Let me describe the three cases, their benchmarks and some crucial points.
 
 
-# Implementation
 
-Link to github repo.
+There are three implementations of the Sha3-256 algorithm, one in web assembly, one in 
+x86_64 assembly for Linux, and one for Arm64 for MacOS. The important code itself is 
+written directly in the assembly languages.
 
-# Procedure
-
-Iterate, discuss the code with agents.
-Codex, GTP5.5, GPT5.6, Claude Opus-4.8, Fable
 
 
 # Web assembly sha3
+
+The code was written directly in a wat file, the web assembly text format using S expressions.
+As usual the web assembly is driven from Javascript. There is a benchmark table in the 
+
+
+
 
 | size (B) | wasm MiB/s | wasm/node performance |
 | --- | ---: | ---: |
@@ -51,6 +109,9 @@ Codex, GTP5.5, GPT5.6, Claude Opus-4.8, Fable
 | size (B) | asm MiB/s | asm/OpenSSL | asm/gcrypt |
 | --- | ---: | ---: | ---: |
 | 1048576 | 736.27 | 1.29x | 1.01x |
+
+
+
 
 # Arm Mac os Sha3
 
