@@ -1,4 +1,4 @@
-Linnea - An HTTP server written in x86_64 assembly with no code dependencies
+Linnea - An HTTP server written in x86_64 assembly with no dependencies
 
 # Introduction
 
@@ -14,7 +14,8 @@ Could the agents help me build the whole application stack, including the HTTP p
 
 During August of 2026, I wrote, in collaboration with Claude and Codex, a web server called Linnea.
 It is open source and available at https://github.com/morten-krogh/linnea.
-Linnea serves the same general role as Nginx, Apache and Caddy, although it does not have all the features of those established servers.
+Linnea serves the same general role as web servers such as Nginx, Apache, Caddy and H2O.
+It does not aim to provide the full range of features offered by those established servers.
 
 Linnea supports HTTP/1.1, HTTP/2 and HTTP/3 over QUIC, with its own TLS 1.3 implementation.
 It serves static files and acts as a reverse proxy to backend services including websockets. 
@@ -56,8 +57,9 @@ This also tested the actual TLS connections and certificates over the internet.
 With my architectural guidance and testing, the agents helped me build a working web server and reverse proxy
 in assembly, including its own HTTP, QUIC and TLS implementations, without third-party code dependencies.
 Linnea is a server I use personally, although its behavior under sustained traffic remains untested.
-
-For me, the main change was in how I worked. I made architectural decisions, discussed behavior and tested the result,
-while the agents wrote and reviewed the assembly code. Building Linnea showed me how much can be done through that division of work.
 Anyone who is interested can use Linnea and contribute to it.
+
+The experiment suggests that assembly is a promising language for future projects developed with AI agents.
+The agents seem capable of handling substantial implementation work in assembly, with a human making architectural decisions,
+guiding development and testing the result. This makes me interested in exploring how far this approach can go.
 
