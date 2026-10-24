@@ -2,13 +2,13 @@ Linnea - An HTTP server written in x86_64 assembly with no code dependencies
 
 # Introduction
 
-In the summer of 2026 AI coding agents had gotten so good that 
-I became interested in the question of whether they could write code
-directly in native code. Could they even do it without using dependencies. 
-My first test case was SHA3 hash functions
-as described in a previous article. That worked out very well, and I got more ambitious.
-I have always been interested in high performance web servers and HTTP proxies so that use case
-was natural to attack next.
+In the summer of 2026, my experience with AI coding agents made me interested in whether they could write
+substantial programs directly in assembly, without third-party code dependencies. My first test case was SHA3 hash functions,
+as described in [a previous article](https://mortenkrogh.substack.com/p/an-assembly-implementation-of-sha).
+That worked out very well, and I got more ambitious.
+
+I have always been interested in high performance web servers and HTTP proxies, so a web server was a natural next project.
+Could the agents help me build the whole application stack, including the HTTP protocols and TLS, from scratch?
 
 # Linnea
 
@@ -38,24 +38,26 @@ the TLS handshake itself.
 
 # How I built it
 
-I wrote Linnea directly on a cloud Linux server 
-Local development on my laptop was not used at all.
-Codex and Claude ran on the server and write code and did audits. I planned, guided and tested the Linnea server. I did not  
-manually read all the code. I did not even have an IDE on the server, just vim. I occasionally looked at code but mostly discussed 
-higher level principles with the agents. The agents reviewed each others work and there were multiple audits of the whole code base.
-The coding experience was obviously totally different from my previous style of local development with an IDE.
-Since the agents ran on a cloud server, there was no downtime just because my laptop was closed.
-I used shh, mosh, and tmux to run and communicate with the agents.
-During testting Linnea served test pages at a public domain that could inspect in a laptop based browser which also tested 
-the actual TLS connections and certificates on the internet.
+Codex and Claude wrote the code and reviewed each other's work. I made most of the architectural decisions,
+including the use of io_uring, which HTTP protocols and TLS version to support, and the inclusion of WebSocket proxying.
+I also decided what should be configurable and what should be hardcoded. I guided the implementation and tested the server.
+I occasionally looked at code, but I did not manually read all of it. Most of my interaction with the agents was about
+architecture and behavior. The agents also performed several reviews of the whole code base.
+
+All development took place on a cloud Linux server, where both agents ran. I used SSH, mosh and tmux to run and
+communicate with them, and vim when I wanted to look at code. There was no local development on my laptop,
+and the agents could continue working when it was closed.
+
+During testing, Linnea served pages at a public domain that I visited in browsers on my laptop.
+This also tested the actual TLS connections and certificates over the internet.
 
 # What the experiment shows
 
-Linnea can be seen as an alternative to established web servers like Nginx, Apache and Caddy.
-It would take extreme amounts of marketing and work to get into that space and that is not my goal of Linnea.
-The goal of Linnea is rather to show that it is possible to write the whole traditional stack for a server 
-application from scratch in assembly or machine code without dependencies. 
-Anyone who is interested can of course use Linnea and contribute to it.
-I will write more about my view of the future of software and cybersecurity in later articles. The point of this article was just to 
-describe sone high level aspects of the Linnea server.
+With my architectural guidance and testing, the agents helped me build a working web server and reverse proxy
+in assembly, including its own HTTP, QUIC and TLS implementations, without third-party code dependencies.
+Linnea is a server I use personally, although its behavior under sustained traffic remains untested.
+
+For me, the main change was in how I worked. I made architectural decisions, discussed behavior and tested the result,
+while the agents wrote and reviewed the assembly code. Building Linnea showed me how much can be done through that division of work.
+Anyone who is interested can use Linnea and contribute to it.
 
