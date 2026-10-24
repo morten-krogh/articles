@@ -1,0 +1,25 @@
+How would the programming look if we had infinitely good programmers.
+
+AI agents, like Claude Fable are not infinitely good, but it is a good approximation.
+
+Let us just assume we had very few constraints.
+
+Native code. Giant blobs of binary code. Browser, JS/webassembly. Operating system.
+No operating system.
+
+The current programming environment.
+
+Programming languages, C, C++, Java, Rust, Go, etc.
+Compilers, interpreters for non-native languages,
+packages, dependency management,
+editors, intellisense, 
+type systems, linters,
+Devops, kubernetes,
+
+
+What part of the current programming languages
+
+
+What would survive.
+
+Protocols, algorithms, mathematical principles, instruction sets,
