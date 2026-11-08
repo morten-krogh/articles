@@ -1,2 +1,188 @@
+Programming Languages for an AI World
+The case for native code and custom software
 
-Introduction
+# Languages built for human programmers
+
+Most programming languages were designed for human programmers. They help us express ideas, manage complexity,
+avoid mistakes and work together. Many of our tools serve the same purposes. It is quite likely that the rise of AI
+will have serious ramifications for programming languages and tools.
+
+As a thought experiment, imagine an infinitely good programmer. They could write the correct program directly for
+the machine and be done. A compiler would just be a limitation since it constrains the executable code. Certain 
+instructions or patterns might never be emitted by the compiler.
+Real agents are far from that ideal. But the thought experiment helps us think about which tools the task requires and
+which tools are only included to compensate for the limitations of the programmer.
+
+My prediction is that increasingly capable agents will make it advantageous to write custom software and that the 
+custome software will be will written directly in the platform's executable
+language. I am particularly interested in heavily used server applications
+running on known hardware and operating systems. I believe that we will see
+trend towards writing such applications in assembly or machine code, using zero
+dependencies, and with complete customization to the use case.
+
+# Native code for a known platform
+
+By native code, I mean code expressed directly in a form accepted by the chosen execution environment.
+For an x86-64 Linux server, that means x86-64 machine instructions using the relevant Linux interfaces and
+calling conventions. For a WebAssembly environment, it means WebAssembly. For a JavaScript engine, it means
+JavaScript. The platform determines what is native. 
+
+There is a slight distinction between assembly code and executable code. For the purpose of this article the distinction 
+hardly matters. Assembly is a convenient textual representation of machine instructions. An assembler and linker still turn
+it into an executable. Working directly on the executable would remove that step too.
+
+# Platform portability is not needed
+
+Portability is often offered as a reason to use a higher-level language. For a custom server, however, the
+requirement may simply be to run on x86-64 Linux or ARM Linux. There is very little point in choosing a higher level language 
+just to be portable. If a port becomes necessary later, agents can just be asked to rewrite the program in another language.
+The agent might even optimize choice of instructions during the port.
+
+# Optimizations
+
+The same reasoning applies to optimizations. An agent can profile the running program, identify an expensive
+path and modify its instructions directly. Optimization does not inherently require translating, or compiling, 
+from another language.
+
+For a program that runs continuously on a server, the benefit of optimizing and cusatomizing its implementation 
+can be repaid many times over. As engineering becomes cheaper, I expect more
+effort to go into implementations tailored to the actual application and
+platform.
+
+# Simpler architectures
+
+Languages influence the architectures we choose. If a language makes elaborate abstractions easy to construct,
+we may use them without asking whether the application needs them. Working closer to the machine makes the
+cost of that machinery more visible.
+
+Consider a server using io_uring. Each connection can belong to one event loop and own its buffers. The event
+loop processes completions, updates explicit state machines and submits further operations. Asynchronous I/O
+does not require an async/await programming model or a separate task for every piece of work.
+
+The application still needs careful rules. A buffer must remain valid while the kernel uses it. A dead connection
+cannot be reclaimed until its outstanding operations and references have been resolved. But these obligations
+can be expressed as a small set of state transitions and ownership rules.
+
+That architecture can be written in Rust, C or assembly. My point is that the architecture itself can remove
+complexity that we might otherwise expect a language or runtime to manage. Simpler languages can encourage
+this approach, although they do not guarantee a simple result.
+
+This is an important part of my prediction. Agents may make straightforward, specialized architectures cheap
+enough to build and maintain that some of the machinery of general-purpose programming becomes unnecessary.
+
+# Checking the program that actually runs
+
+Direct control is useful only if we can check the result. Choosing assembly does not remove the need for
+contracts, tests, analysis, debugging or performance measurements.
+
+Rust provides useful checks on ownership and memory access. Those checks are a substantial reason to choose
+it today. But the information they use does not inherently have to live in a higher-level implementation.
+Assembly functions can have explicit contracts describing their arguments, results, memory access, side
+effects and required behavior.
+
+These contracts could live beside the code as annotations or in companion files. Tools could check the
+implementation against them. Work such as [Vale](https://project-everest.github.io/vale/intro.html) already
+demonstrates verification of assembly-level code using preconditions, postconditions and invariants.
+
+Tests, fuzzing, profilers and monitoring would provide further evidence. They serve different purposes:
+passing tests does not prove every property, and a performance measurement says little about correctness.
+The agent needs to use the appropriate checks for the changes it makes. It also needs to preserve the intended
+contract rather than weaken it to accommodate an incorrect implementation.
+
+Working directly on native code can shorten the path from observation to modification. The agent inspects
+the instructions that ran and changes those instructions. It need not express a change indirectly and then
+check whether a compiler produced the intended result. Useful traces still require names, data layouts and
+meaningful events, all of which can accompany the native code.
+
+# Taking ownership of the whole application
+
+Dependencies save programmers enormous amounts of work. They also introduce code, interfaces, updates and
+maintenance decisions controlled elsewhere. If agents make implementation and maintenance much cheaper,
+that balance may change.
+
+I expect applications to incorporate more of the functionality they need into codebases their own agents can
+understand and maintain. This does not require inventing every algorithm or writing every line from scratch.
+
+Cryptography is a useful example. Reading an algorithm's specification introduces no third-party implementation
+dependency. Downloading an implementation and incorporating it does. Reading and checking that implementation
+does not erase its origin, but it can change our relationship to it. We can take responsibility for the code
+instead of treating it as an opaque external component.
+
+An agent might study an existing implementation, retain it, specialize it or produce another implementation.
+There is no benefit in rewriting correct code merely to claim originality. Reading the code is also only the
+beginning: tests, review and verification need to establish the properties the application relies on.
+
+The goal is ownership of the implementation. The application agent should be able to explain why the code is
+there, how it works and how to maintain it. Copying a library into a repository without understanding it does
+not achieve that. Taking ownership also means following relevant discoveries and correcting defects over time.
+
+# When the executable becomes the source
+
+We usually call the C program the source and the compiled executable the binary. That distinction reflects
+how humans prefer to work. It becomes less useful if an agent can understand and modify the executable directly.
+
+The [Open Source Definition](https://opensource.org/osd) describes source as the preferred form in which a
+programmer would modify the program. What happens when the programmer prefers machine code?
+
+Compilation can discard names, comments and information about the author's intent. An agent does not need to
+recover those exact artifacts to continue developing the program. It needs enough understanding to modify
+the implementation and check its behavior. My hypothesis is that agents will increasingly be able to do that
+from the executable itself, together with its specification.
+
+We already distinguish a program from the process that produced it. Programmers use generators, editor
+snippets and other tools without necessarily publishing all of them. Their importance depends on whether
+someone needs them to maintain the result. The same question can be asked about higher-level source code.
+
+If the executable is also the maintained artifact, another source of complexity disappears. There is no
+separate build whose relationship to the reviewed source must be established. We can review and sign the
+artifact that will actually run. Its origin and correctness still matter, but there is no translation between
+two representations to account for.
+
+Distributing a binary would not by itself grant permission to modify or redistribute it. Licenses would still matter.
+But if agents can work effectively with binaries, distributing one would no longer conceal the implementation
+in any useful sense. The practical boundary would be whether we distribute the program at all.
+
+# Private implementations behind public APIs
+
+For a custom server, I would prefer to keep both the source and executable private and expose the application
+through its API. This can give the defender an information advantage. The application's agents can inspect
+the implementation, run instrumented tests and observe internal state. An external attacker with only API
+access has less information and must learn through the behavior the application exposes.
+
+That advantage is conditional on the implementation remaining private. It also does not prevent an attacker
+from discovering flaws through the API. The application should remain defensible if its code becomes known.
+Even so, making an attack require more work is useful. [MITRE's discussion of obscurity](https://cwe.mitre.org/data/definitions/656.html)
+recognizes this possible contribution while warning against relying on it as the main protection.
+
+Specialization offers another potential advantage. An application can omit features it does not need and
+avoid vulnerabilities specific to libraries it does not use. A custom implementation may also make an exploit
+developed for a common package inapplicable.
+
+Replacing necessary functionality with new code can introduce new defects, however. Incorporated code can
+retain the defects of its original implementation. The security case therefore depends on keeping the system
+small and checking and maintaining it thoroughly. Privacy and customization are possible advantages, not
+evidence that the implementation is correct.
+
+I think capable agents could make this combination more attractive: a specialized implementation that the
+defender understands in detail, continuously examines and keeps private. This argument applies to custom
+software generally. The case for assembly comes from the control and architectural choices discussed earlier.
+
+# A future of continuously maintained custom software
+
+I imagine applications with agents involved throughout their lives. They would monitor behavior, investigate
+unexpected events, profile expensive paths, test changes and maintain the implementation. Observations from
+actual use would feed into the next round of investigation, changes and checks.
+
+That ongoing work is central to the argument. Writing an initial implementation cheaply is not enough.
+Agents must also make it affordable to understand the system, preserve its contracts and keep it working
+as requirements change.
+
+For custom server applications on known platforms, I expect this to favor native code and more direct control
+over the whole implementation. Assembly becomes more attractive when agents can handle its details and when
+the architecture keeps those details manageable. Existing code can still be reused, but more of it may come
+under the application's own maintenance.
+
+I think we will see much more software built this way: tailored to its task, supported by fewer external
+dependencies and continuously maintained by agents working with human architectural guidance. We should
+choose its languages and tools according to what the application needs, and reconsider the assumptions
+inherited from programming by hand.
