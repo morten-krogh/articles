@@ -6,66 +6,87 @@ Most programming languages were designed for human programmers. They help us exp
 avoid mistakes and work together. Many of our tools serve the same purposes. It is likely that the rise of AI
 will have serious ramifications for such programming languages and tools.
 
-As a thought experiment, imagine the infinitely good programmer. This programmer would write the correct program 
-directly for the machine and be done. Such a programmer would not need external libraries and dependencies. Such a
-programmer would not need a compiler to translate between a source and a target language.
-Real agents are far from that ideal. But I still find the thought experiment informative in terms of guiding the
-future of programming.
+As a thought experiment, imagine an infinitely good programmer. They could
+write the correct program directly for the machine, without needing external
+libraries or a compiler to translate from another language. Real agents are far
+from that ideal, but the thought experiment helps us reconsider which tools
+increasingly capable programmers will need.
 
-My prediction is that increasingly capable agents will write directly in the platform's executable
-language. This is particularly the case for heavily used server applications.
+My prediction is that increasingly capable agents will write directly in the
+platform's executable language. I expect this to be particularly attractive for
+heavily used, custom server applications running on a known platform.
+
 We usually call the C, C++ or Rust program the source and the compiled executable the binary. That distinction reflects
 how humans prefer to work. It becomes less useful if an agent can understand and modify the executable directly.
 
-The meaning of native code depends on the chosen execution environment.
-For an x86-64 Linux server, native code means x86-64 machine instructions using the relevant Linux interfaces and
-calling conventions. For a WebAssembly environment, it means WebAssembly. For a JavaScript engine, it means
-JavaScript. The platform determines what is native. There is a slight distinction between assembly code and 
-executable code. However, that distinction is hardly important here and for all practical purposes assembly code is native.
-The translation from assembly to machine code is deterministic and fast.
+The meaning of native code depends on the chosen execution environment.  For an
+x86-64 Linux server, native code means x86-64 machine instructions using the
+relevant Linux interfaces and calling conventions. For a WebAssembly
+environment, it means WebAssembly. For a JavaScript engine, it means
+JavaScript. The platform determines what is native.  Assembly still needs to be
+assembled and linked into an executable, but it lets the programmer specify the
+machine instructions directly. For this discussion, I would include assembly
+under native code.
 
 I also envision that applications will become more and more customized and
-specialized.  Specialization offers the advantage that An application can omit
+specialized. Specialization offers the advantage that an application can omit
 features it does not need and avoid vulnerabilities specific to libraries it
-does not use. For example, there is no reason to use a general purpose proxy
-server in front of an application. The proxy server is usually optimized for a
-host of use cases that are irrelevant for the application under consideration.
+does not use.  A custom application may have little need for a general-purpose
+proxy in front of it. The functionality it actually needs could be implemented
+directly.
 
 I also believe that applications will be written using close to zero external
-libraries and dependencies.  Dependencies used to save programmers enormous
-amounts of work. However, they also introduce code, interfaces, updates and
-maintenance decisions controlled elsewhere. If agents make implementation and
-maintenance much cheaper, the balance has flipped towards no dependencies.
+libraries and dependencies. Dependencies save programmers enormous amounts of
+work. However, they also introduce code, interfaces, updates and maintenance
+decisions controlled elsewhere.  If agents make implementation and maintenance
+much cheaper, I expect the balance to shift towards fewer dependencies.
+Existing implementations can still be incorporated, provided the application's
+agents inspect, check and take responsibility for maintaining them.
 
-Portability is often offered as a reason to use a higher-level language. For a custom server, however, the
-platform is usually known in advance, e.g.e x86-64/Linux or ARM/Linux. Choosing a higher level language 
-just to be portable will be unncecessary. If another platform becomes necessary later, 
-agents can just rewrite the program in the other language. It is basically a new application with a similar API.
+Portability is often offered as a reason to use a higher-level language. For a
+custom server, however, the platform is usually known in advance, for example
+x86-64/Linux or ARM/Linux. Choosing a higher level language just to be portable
+will be unnecessary.  If another platform becomes necessary later, agents could
+produce and validate an implementation for the new platform.
 
-Optimizations are much easier to reason about if the native code is monitored and updated based on execution feedback. 
-Transkation or compilation from Another language just makes it harder to reason about. An agent can profile 
-a running program, identify an expensive
-path and modify its instructions directly. 
-For a program that runs continuously on a server, the benefits of optimizing and 
-customizing the machine code are obvious. The program runs faster, uses less memory.
+Optimizations are much easier to reason about if the native code is monitored
+and updated based on execution feedback. Translation or compilation from
+another language just makes it harder to reason about. An agent can profile a
+running program, identify an expensive path and modify its instructions
+directly.  Working directly with the instructions makes it easier to connect a
+measured cost to a particular implementation choice. For a continuously running
+server, even small improvements in execution time or memory use can justify
+substantial optimization work.
 
-Event loops are ubiquitous in server applications. Mostly cross platform libraries such as libev, libevent, libuv, or asio 
-are used, or the higher level language comes with its own asynchronous stack. The whole langauge might be more or less 
-ergonomic for async programming. In native code with a direct lineage to Linux, or other operating systems, the program could
-instead hook into the native APIs such as epoll or io_uring and build state machines around those system calls. Conceptually, the code
-becomes simpler to reason about, even though it will be hard for a human to read it, or course.
+Event loops are ubiquitous in server applications. Mostly cross platform
+libraries such as libev, libevent, libuv, or asio are used, or the higher level
+language comes with its own asynchronous stack. The whole language might be
+more or less ergonomic for async programming. 
 
-Security is also easier to deal with in a simpler tool chain. Using no external
-librearies will minmize the attack surface. The security of the application can
-be made very high by not using any external dependencies, having AI agents
-review and monitor the application continuously, and keeping the code secret.
-An attacker on the internet will have very little to work with. The information
-kwown to the attacker is just the API and the protocols. For example, a
-vulnerability in the TLS protocol itself would hurt these applications, but 
-a vulnerability in a popular crypto library would not. Existing code can still be reused, but more 
-as a guide for custom implementations rather than direct imports.
+A program using Linux's interface directly could use APIs such as epoll or
+io_uring and build state machines around those system calls. Conceptually, the
+code becomes simpler to reason about.  Native code would still need contracts,
+tests and analysis. Function contracts could describe arguments, memory access
+and expected behavior, and tools could check implementations against them.
+These checks need not require the implementation to be written in a
+higher-level language.
+
+I also think custom applications can have security advantages. Omitting unnecessary
+features reduces the functionality that needs to be defended. An application that
+does not use a particular library avoids defects specific to that implementation,
+although a replacement can have defects of its own. Reused code still needs to be
+checked and maintained as part of the application. For a server exposed through an
+API, I would keep the code private. The application's
+agents can inspect the code, instrument its execution and continuously test and
+monitor its behavior. An external attacker with only API access must work from
+the behavior visible through that interface. This information advantage can make
+vulnerabilities harder to discover and exploit. The implementation should still
+be secure if its code becomes known. My expectation is that agents will make it
+more affordable to maintain a small, carefully checked implementation, with
+privacy providing an additional obstacle for attackers.
 
 Besides the programming phase itself, I imagine agents will be involved throughout the life of the application.
 The agents will monitor behavior, read logs, trace the executable, investigate
-unexpected events, profile expensive paths, test changes and do general maintainance.
+unexpected events, profile expensive paths, test changes and do general maintenance.
 
+I expect the continued improvement of AI agents to make specialized native implementations increasingly attractive, with fewer external dependencies and more of the application under its own agents' control.
