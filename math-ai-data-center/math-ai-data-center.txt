@@ -1,0 +1,29 @@
+
+Mathematicians must build and operate data centers.
+Train AI models.
+Repositories or databses with all known mathematics.
+Formal verification.
+Syntax for formal proofs.
+Publishing will be replaced with the repository.
+Constant reviewing by AI.
+Access through promppting for
+Individual subscriptions or access to cheap inference will not be competitive.
+International collaboration similar to particle accelerators.
+Frontier math research is about expanding math knowledge.
+Humans will not be able to understand all, and that is already the situation before AI.
+Mth will explode in difficulty and size of the problems and length of the proofs.
+Very little value in traditional human generated proofs.
+Compamies selling access to general models is a bad model for the math community.
+The data center is a kind of math brain. It is not a tool but more a new brain that needs to be nurtured, trained, fed etc.
+
+Small research groups at every university will make less sense except as host institutions for the data centers, 
+similar to the particle accelerators. 
+
+Mathematicians of the future will be more versatile and have to take care of data center operations,
+continuous training, processor allocation for various research topics, model improvements, inference optimizations,
+repository optimizations, parallelization of research, etc. This kind of work can be very exciting in a slightly different way 
+from traditional math. 
+
+Mathemticinas must take charge of their own future.
+Start lobbying sociaety and politicians for new funding models
+
